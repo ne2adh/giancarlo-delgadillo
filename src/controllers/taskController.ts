@@ -18,7 +18,7 @@ export const getTaskById = async (req: Request, res: Response) => {
     const task = await Task.findOne({ where: { id, userId: req.userId } });
     if (!task) return res.status(404).json({ message: 'Task not found' });
 
-    res.json(task);
+    res.json({ name: task.name, done: task.done });
   } catch (error) {
     res.status(500).json({ message: 'Error retrieving task', error });
   }
@@ -28,10 +28,18 @@ export const getTaskById = async (req: Request, res: Response) => {
 export const createTask = async (req: Request, res: Response) => {
   try {
     const { name, done } = req.body;
-    if(req.userId){
-      const task = await Task.create({ name, userId: Number(req.userId), done });
-      res.status(201).json(task);
+
+    if (!req.userId) {
+      return res.status(401).json({ message: 'Token required' });
     }
+
+    const task = await Task.create({
+      name,
+      userId: Number(req.userId), // Asegúrate de que userId esté disponible
+      done: done || false,
+    });
+
+    res.status(201).json(task);
   } catch (error) {
     res.status(500).json({ message: 'Error creating task', error });
   }

@@ -9,7 +9,7 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
   const userId = verifyToken(token);
   if (!userId) return res.status(401).json({ message: 'Invalid token' });
 
-  req.userId = userId;
+  req.userId = String(userId.userId);
   next();
 };
 
